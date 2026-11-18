@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GNU/Linux та Bash | ПР 23</title>
+  <meta name="description" content="Практична робота 23: вступ у Bash, ОС GNU/Linux">
+  <style>
+    :root {
+      --bg: #10130f; --card: #181d17; --text: #e4e8e1; --muted: #98a393;
+      --accent: #f6c445; --accent2: #7bc96f; --code: #0b0d0a; --border: #2b3328;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { font-family: "Segoe UI", Roboto, Arial, sans-serif; background: var(--bg); color: var(--text); line-height: 1.65; }
+    header { padding: 56px 20px 40px; text-align: center; background: linear-gradient(135deg, #2d3a1f 0%, #10130f 100%); border-bottom: 3px solid var(--accent); }
+    header .tux { font-size: 3.2rem; }
+    header h1 { font-size: 2.5rem; margin: 6px 0; }
+    header h1 span { color: var(--accent); }
+    header p { color: var(--muted); font-size: 1.1rem; }
+    .prompt { font-family: Consolas, monospace; color: var(--accent2); margin-top: 14px; }
+    .prompt::after { content: "_"; animation: blink 1s steps(1) infinite; }
+    @keyframes blink { 50% { opacity: 0; } }
+    nav { position: sticky; top: 0; z-index: 10; background: rgba(16,19,15,.95); border-bottom: 1px solid var(--border); display: flex; flex-wrap: wrap; justify-content: center; gap: 4px; padding: 10px; }
+    nav a { color: var(--text); text-decoration: none; padding: 6px 14px; border-radius: 6px; font-size: .95rem; }
+    nav a:hover { background: var(--accent); color: #111; }
+    main { max-width: 960px; margin: 0 auto; padding: 32px 20px 60px; }
+    section { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 28px; margin-bottom: 28px; scroll-margin-top: 70px; }
+    h2 { color: var(--accent); font-size: 1.6rem; margin-bottom: 16px; padding-bottom: 8px; border-bottom: 2px solid var(--border); }
+    h3 { color: var(--accent2); margin: 18px 0 8px; }
+    p { margin-bottom: 12px; }
+    ul { margin: 0 0 12px 22px; }
+    li { margin-bottom: 6px; }
+    code { font-family: Consolas, monospace; background: var(--code); padding: 1px 6px; border-radius: 4px; color: var(--accent); }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px; }
+    .distro { background: var(--code); border: 1px solid var(--border); border-top: 4px solid var(--c, var(--accent)); border-radius: 8px; padding: 16px; }
+    .distro h4 { font-size: 1.15rem; margin-bottom: 4px; }
+    .distro .base { font-size: .85rem; color: var(--muted); margin-bottom: 8px; }
+    .distro p { font-size: .95rem; margin: 0; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { padding: 10px 12px; border: 1px solid var(--border); text-align: left; vertical-align: top; }
+    th { background: var(--code); color: var(--accent2); }
+    td:first-child { white-space: nowrap; }
+    .term { background: var(--code); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; margin: 12px 0; }
+    .term-bar { background: #222a20; padding: 8px 12px; display: flex; gap: 6px; align-items: center; font-size: .85rem; color: var(--muted); }
+    .term-bar i { width: 12px; height: 12px; border-radius: 50%; display: inline-block; }
+    .term-bar i:nth-child(1) { background: #ff5f56; } .term-bar i:nth-child(2) { background: #ffbd2e; } .term-bar i:nth-child(3) { background: #27c93f; }
+    .term-bar span { margin-left: 8px; }
+    pre { padding: 14px 16px; overflow-x: auto; font-family: Consolas, "Courier New", monospace; font-size: .92rem; line-height: 1.5; }
+    .ps { color: var(--accent2); } .cm { color: #6f8a68; } .out { color: var(--muted); }
+    .btn { display: inline-block; background: var(--accent); color: #111; font-weight: 600; padding: 10px 20px; border-radius: 8px; text-decoration: none; margin: 6px 6px 0 0; }
+    .btn:hover { opacity: .9; }
+    .note { border-left: 4px solid var(--accent2); background: var(--code); padding: 12px 16px; border-radius: 6px; margin: 12px 0; }
+    a { color: var(--accent2); }
+    footer { text-align: center; color: var(--muted); padding: 24px; border-top: 1px solid var(--border); font-size: .9rem; }
+    @media (max-width: 600px) { header h1 { font-size: 1.8rem; } section { padding: 20px; } td:first-child { white-space: normal; } }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="tux">🐧</div>
+  <h1>ОС <span>GNU/Linux</span> та Bash</h1>
+  <p>Практична робота 23 · Вступ у Bash · Системне програмування</p>
+  <div class="prompt">student@linux:~$ </div>
+</header>
+
+<nav>
+  <a href="#about">Про GNU/Linux</a>
+  <a href="#distros">Дистрибутиви</a>
+  <a href="#commands">Команди CLI</a>
+  <a href="#script">Bash-скрипт</a>
+  <a href="#sources">Джерела</a>
+</nav>
+
+<main>
+
+  <!-- 1. Коротка інформація -->
+  <section id="about">
+    <h2>1. Коротка інформація про ОС GNU/Linux</h2>
+    <p>
+      <strong>GNU/Linux</strong> — сімейство вільних Unix-подібних операційних систем, побудованих на
+      <strong>ядрі Linux</strong> та системних програмах <strong>проєкту GNU</strong>. Вихідний код системи
+      відкритий: його можна вільно використовувати, вивчати, змінювати та поширювати.
+    </p>
+    <h3>Історія</h3>
+    <ul>
+      <li><strong>1983</strong> — Річард Столлман оголошує проєкт <strong>GNU</strong> зі створення вільної Unix-подібної ОС;</li>
+      <li><strong>1985</strong> — засновано Фонд вільного програмного забезпечення (FSF), з'являється ліцензія GNU GPL;</li>
+      <li><strong>1991</strong> — фінський студент <strong>Лінус Торвальдс</strong> публікує першу версію ядра <strong>Linux</strong>;</li>
+      <li><strong>1992</strong> — ядро Linux переходить на ліцензію GPL, і поєднання GNU + Linux дає повноцінну вільну ОС;</li>
+      <li><strong>1993</strong> — з'являються перші великі дистрибутиви: Slackware та Debian.</li>
+    </ul>
+    <h3>Складові системи</h3>
+    <ul>
+      <li><strong>Ядро (kernel)</strong> — керує процесором, пам'яттю, пристроями, процесами;</li>
+      <li><strong>Оболонка (shell)</strong> — командний інтерпретатор, найпоширеніший — <code>bash</code>;</li>
+      <li><strong>Системні утиліти GNU</strong> — <code>ls</code>, <code>cp</code>, <code>grep</code>, компілятор <code>gcc</code> тощо;</li>
+      <li><strong>Графічне середовище</strong> (необов'язково) — GNOME, KDE Plasma, Xfce;</li>
+      <li><strong>Менеджер пакетів</strong> — встановлення програм: <code>apt</code>, <code>dnf</code>, <code>pacman</code>.</li>
+    </ul>
+    <h3>Де використовується</h3>
+    <p>
+      Linux працює на більшості серверів інтернету, на всіх суперкомп'ютерах зі списку TOP500, у хмарних
+      сервісах, вбудованих пристроях, роутерах, а також є основою ОС <strong>Android</strong>.
+    </p>
+    <div class="note">
+      <strong>Переваги:</strong> безкоштовність, відкритий код, стабільність, безпека, гнучке налаштування,
+      потужний командний рядок та величезна спільнота.
+    </div>
+  </section>
+
+  <!-- 2. Дистрибутиви -->
+  <section id="distros">
+    <h2>2. Найпопулярніші дистрибутиви Linux</h2>
+    <p><strong>Дистрибутив</strong> — це готова до встановлення збірка ОС: ядро Linux + утиліти + менеджер пакетів + набір програм.</p>
+    <div class="grid">
+      <div class="distro" style="--c:#e95420"><h4>Ubuntu</h4><div class="base">Основа: Debian · пакети: apt / .deb</div><p>Найпопулярніший дистрибутив для початківців, робочих станцій і серверів. Розробник — Canonical.</p></div>
+      <div class="distro" style="--c:#a80030"><h4>Debian</h4><div class="base">Незалежний · пакети: apt / .deb</div><p>Один з найстаріших (1993) і найстабільніших дистрибутивів, основа для Ubuntu, Mint, Kali.</p></div>
+      <div class="distro" style="--c:#87cf3e"><h4>Linux Mint</h4><div class="base">Основа: Ubuntu · пакети: apt / .deb</div><p>Зручний для тих, хто переходить з Windows; середовище Cinnamon.</p></div>
+      <div class="distro" style="--c:#51a2da"><h4>Fedora</h4><div class="base">Основа: Red Hat · пакети: dnf / .rpm</div><p>Сучасні технології та свіже ПЗ, спонсор — Red Hat.</p></div>
+      <div class="distro" style="--c:#1793d1"><h4>Arch Linux</h4><div class="base">Незалежний · пакети: pacman</div><p>Мінімалістичний rolling-release дистрибутив для досвідчених користувачів.</p></div>
+      <div class="distro" style="--c:#ee0000"><h4>Red Hat Enterprise Linux</h4><div class="base">Комерційний · пакети: dnf / .rpm</div><p>Корпоративний серверний дистрибутив з комерційною підтримкою.</p></div>
+      <div class="distro" style="--c:#73ba25"><h4>openSUSE</h4><div class="base">Незалежний · пакети: zypper / .rpm</div><p>Зручний інструмент налаштування YaST; версії Leap і Tumbleweed.</p></div>
+      <div class="distro" style="--c:#367bf0"><h4>Kali Linux</h4><div class="base">Основа: Debian · пакети: apt / .deb</div><p>Спеціалізований дистрибутив для тестування безпеки та кібербезпеки.</p></div>
+    </div>
+  </section>
+
+  <!-- 3. Команди -->
+  <section id="commands">
+    <h2>3. Приклади команд роботи в Linux CLI</h2>
+    <table>
+      <tr><th>Команда</th><th>Призначення</th><th>Приклад</th></tr>
+      <tr><td><code>pwd</code></td><td>Показати шлях до поточного каталогу (print working directory)</td><td><code>pwd</code></td></tr>
+      <tr><td><code>echo</code></td><td>Вивести текст або значення змінної</td><td><code>echo "Hello, $USER"</code></td></tr>
+      <tr><td><code>ls</code></td><td>Показати вміст каталогу (<code>-l</code> — детально, <code>-a</code> — з прихованими)</td><td><code>ls -la</code></td></tr>
+      <tr><td><code>cd</code></td><td>Перейти в інший каталог (<code>..</code> — на рівень вище, <code>~</code> — домашній)</td><td><code>cd /home/student</code></td></tr>
+      <tr><td><code>touch</code></td><td>Створити порожній файл або оновити час його зміни</td><td><code>touch notes.txt</code></td></tr>
+      <tr><td><code>mkdir</code></td><td>Створити каталог (<code>-p</code> — разом із батьківськими)</td><td><code>mkdir -p lab/src</code></td></tr>
+      <tr><td><code>cp</code></td><td>Копіювати файли (<code>-r</code> — каталоги рекурсивно)</td><td><code>cp notes.txt backup.txt</code></td></tr>
+      <tr><td><code>mv</code></td><td>Перемістити або перейменувати файл</td><td><code>mv backup.txt lab/</code></td></tr>
+      <tr><td><code>rm</code></td><td>Видалити файл (<code>-r</code> — каталог, <code>-i</code> — із запитом)</td><td><code>rm -i notes.txt</code></td></tr>
+      <tr><td><code>history</code></td><td>Показати історію введених команд</td><td><code>history 10</code></td></tr>
+    </table>
+
+    <h3>Приклад сеансу в терміналі</h3>
+    <div class="term">
+      <div class="term-bar"><i></i><i></i><i></i><span>student@linux: ~</span></div>
+<pre><span class="ps">student@linux:~$</span> pwd
+<span class="out">/home/student</span>
+<span class="ps">student@linux:~$</span> echo "Привіт, Linux!"
+<span class="out">Привіт, Linux!</span>
+<span class="ps">student@linux:~$</span> mkdir lab23          <span class="cm"># створюємо каталог</span>
+<span class="ps">student@linux:~$</span> cd lab23              <span class="cm"># переходимо в нього</span>
+<span class="ps">student@linux:~/lab23$</span> touch a.txt b.txt   <span class="cm"># створюємо два файли</span>
+<span class="ps">student@linux:~/lab23$</span> ls
+<span class="out">a.txt  b.txt</span>
+<span class="ps">student@linux:~/lab23$</span> cp a.txt c.txt      <span class="cm"># копія файлу</span>
+<span class="ps">student@linux:~/lab23$</span> mv b.txt notes.txt  <span class="cm"># перейменування</span>
+<span class="ps">student@linux:~/lab23$</span> rm a.txt            <span class="cm"># видалення</span>
+<span class="ps">student@linux:~/lab23$</span> ls -l
+<span class="out">-rw-r--r-- 1 student student 0 Nov 18 21:50 c.txt
+-rw-r--r-- 1 student student 0 Nov 18 21:50 notes.txt</span>
+<span class="ps">student@linux:~/lab23$</span> history 3
+<span class="out">  9  mv b.txt notes.txt
+ 10  rm a.txt
+ 11  ls -l</span></pre>
+    </div>
+  </section>
+
+  <!-- 4. Скрипт -->
+  <section id="script">
+    <h2>4. BASH-скрипт: імітація авторизації в системі</h2>
+    <p>Скрипт імітує текстовий вхід у систему, як у консолі Linux (<code>login:</code> / <code>Password:</code>):</p>
+    <ul>
+      <li>паролі зберігаються не у відкритому вигляді, а як хеші <strong>SHA-256</strong>;</li>
+      <li>пароль вводиться приховано (<code>read -s</code>);</li>
+      <li>дається <strong>3 спроби</strong>, після чого доступ блокується на 5 секунд зі зворотним відліком;</li>
+      <li>після входу відкривається міні-сесія з меню та командою <code>logout</code>.</li>
+    </ul>
+    <p>Тестові акаунти: <code>admin</code> / <code>admin123</code> та <code>student</code> / <code>linux2026</code>.</p>
+    <a class="btn" href="auth.sh" download>⬇ Завантажити auth.sh</a>
+
+    <div class="term">
+      <div class="term-bar"><i></i><i></i><i></i><span>auth.sh</span></div>
+<pre>#!/bin/bash
+# =====================================================
+#  ПР 23. Вступ у Bash — імітація авторизації в системі
+#  Запуск:  chmod +x auth.sh &amp;&amp; ./auth.sh
+#  Тестові акаунти:  admin / admin123,  student / linux2026
+# =====================================================
+
+# ---------- Кольори ----------
+RED='\033[1;31m'
+GREEN='\033[1;32m'
+YELLOW='\033[1;33m'
+CYAN='\033[1;36m'
+NC='\033[0m'
+
+# ---------- "База" користувачів: логін -&gt; SHA-256 хеш пароля ----------
+# Паролі не зберігаються у відкритому вигляді, лише їхні хеші
+declare -A USERS=(
+    [admin]="240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9"   # admin123
+    [student]="c4f9fa0b227bd46a37bf49b6f56d8b8750b7e46d39d79654f440e139916d8581" # linux2026
+)
+
+MAX_ATTEMPTS=3      # кількість спроб входу
+LOCK_TIME=5         # секунд блокування після невдалих спроб
+
+# ---------- Функція: хешування пароля ----------
+hash_password() {
+    printf '%s' "$1" | sha256sum | cut -d' ' -f1
+}
+
+# ---------- Функція: заголовок ----------
+banner() {
+    clear
+    echo -e "${CYAN}=========================================${NC}"
+    echo -e "${CYAN}   GNU/Linux $(uname -r 2&gt;/dev/null)${NC}"
+    echo -e "${CYAN}   $(hostname 2&gt;/dev/null) login — $(date '+%d.%m.%Y %H:%M')${NC}"
+    echo -e "${CYAN}=========================================${NC}"
+}
+
+# ---------- Функція: сесія після входу ----------
+session() {
+    local user=$1
+    echo -e "\n${GREEN}Вхід виконано успішно. Вітаємо, ${user}!${NC}"
+    echo -e "Останній вхід: $(date '+%a %d %b %Y %H:%M:%S')"
+    echo
+    while true; do
+        echo -e "${YELLOW}1${NC} — інформація про користувача"
+        echo -e "${YELLOW}2${NC} — поточна дата і час"
+        echo -e "${YELLOW}3${NC} — вміст поточного каталогу"
+        echo -e "${YELLOW}0${NC} — вийти із системи (logout)"
+        read -p "${user}@system:~\$ " cmd
+        case $cmd in
+            1) echo -e "Користувач: ${GREEN}${user}${NC}, роль: $([[ $user == admin ]] &amp;&amp; echo адміністратор || echo користувач)" ;;
+            2) date ;;
+            3) ls ;;
+            0) echo -e "${CYAN}logout. Сеанс користувача ${user} завершено.${NC}"; return ;;
+            *) echo -e "${RED}Невідома команда${NC}" ;;
+        esac
+        echo
+    done
+}
+
+# ---------- Головна логіка авторизації ----------
+banner
+attempt=1
+while (( attempt &lt;= MAX_ATTEMPTS )); do
+    read -p "login: " username
+    read -s -p "Password: " password     # -s — пароль не відображається
+    echo
+
+    if [[ -z $username || -z $password ]]; then
+        echo -e "${RED}Логін і пароль не можуть бути порожніми.${NC}"
+    elif [[ -n ${USERS[$username]} &amp;&amp; ${USERS[$username]} == "$(hash_password "$password")" ]]; then
+        session "$username"
+        exit 0
+    else
+        left=$(( MAX_ATTEMPTS - attempt ))
+        echo -e "${RED}Login incorrect.${NC} Залишилось спроб: ${left}"
+    fi
+    (( attempt++ ))
+    echo
+done
+
+# ---------- Блокування після невдалих спроб ----------
+echo -e "${RED}Забагато невдалих спроб! Доступ заблоковано на ${LOCK_TIME} с.${NC}"
+for (( i = LOCK_TIME; i &gt; 0; i-- )); do
+    printf "\rРозблокування через %d с... " "$i"
+    sleep 1
+done
+echo -e "\n${YELLOW}Спробуйте запустити скрипт ще раз.${NC}"
+exit 1</pre>
+    </div>
+
+    <h3>Запуск</h3>
+    <div class="term">
+      <div class="term-bar"><i></i><i></i><i></i><span>bash</span></div>
+<pre><span class="ps">student@linux:~$</span> chmod +x auth.sh   <span class="cm"># дозвіл на виконання</span>
+<span class="ps">student@linux:~$</span> ./auth.sh
+<span class="out">login: student
+Password:
+Вхід виконано успішно. Вітаємо, student!</span></pre>
+    </div>
+  </section>
+
+  <!-- 5. Джерела -->
+  <section id="sources">
+    <h2>5. Джерела інформації</h2>
+    <ul>
+      <li><a href="https://www.gnu.org/gnu/linux-and-gnu.uk.html" target="_blank">Linux та система GNU — gnu.org</a></li>
+      <li><a href="https://www.kernel.org/" target="_blank">The Linux Kernel Archives — kernel.org</a></li>
+      <li><a href="https://www.gnu.org/software/bash/manual/" target="_blank">GNU Bash Reference Manual</a></li>
+      <li><a href="https://linuxcommand.org/" target="_blank">LinuxCommand.org — William Shotts</a></li>
+      <li><a href="https://linuxsimply.com/bash-scripting-tutorial/" target="_blank">LinuxSimply — Bash Scripting Tutorial</a></li>
+      <li><a href="https://distrowatch.com/" target="_blank">DistroWatch — огляд дистрибутивів</a></li>
+      <li><a href="https://uk.wikipedia.org/wiki/Linux" target="_blank">Linux — Вікіпедія</a></li>
+    </ul>
+  </section>
+
+</main>
+
+<footer>
+  ПР 23 · Вступ у Bash · Системне програмування · 2026
+  <br>Сайт розроблено за допомогою Claude (Anthropic)
+</footer>
+
+</body>
+</html>
